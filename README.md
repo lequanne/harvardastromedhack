@@ -10,7 +10,7 @@ The data correlation logic isn't even wrong. It's just deliberately applied to t
 
 ## Origin
 
-Originally built for the [HackHarvard 2017](https://hackharvard-2017.devpost.com/) energy hack, which drew non-obvious correlations between electricity usage and financial markets. Appliance Horoscope takes that logic and breaks it completely: pull your home's smart meter data, cross it with moon phase, local weather, and whatever your fridge's compressor cycle was doing at 3am — then generate a daily horoscope for each appliance.
+Originally built for the [HackHarvard 2017](https://hackharvard-2017.devpost.com/) energy hack, which drew non-obvious correlations between electricity usage and financial markets. Appliance Horoscope takes that logic and breaks it completely: pull your home's smart meter data, cross it with moon phase, local weather, and whatever your fridge's compressor cycle was doing at 3am, then generate a daily horoscope for each appliance.
 
 > *"Your dishwasher is in retrograde. It ran four incomplete cycles this week and is clearly processing something. Do not confront it directly. Offer it a shorter rinse setting and space."*
 
