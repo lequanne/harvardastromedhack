@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Appliance Horoscope ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --void:#07070a;
+  --deep:#0d0d14;
+  --surface:#13131f;
+  --card:#1a1a2e;
+  --border:#2a2a42;
+  --glow:#6c63ff;
+  --glow2:#c084fc;
+  --gold:#f4c53e;
+  --gold-dim:#7a621e;
+  --text:#e8e6f0;
+  --muted:#6b6882;
+  --red:#e05c7a;
+  --red-dim:#2a1220;
+  --green:#3bba78;
+  --green-dim:#0d2118;
+  --radius:14px;
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--void);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── Stars background ── */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:var(--a1)}100%{opacity:var(--a2)}}
+
+/* ── Layout ── */
+.page{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:2rem 1.25rem 5rem}
+
+/* ── Header ── */
+header{text-align:center;padding:3rem 0 2rem}
+.sigil{font-size:3rem;margin-bottom:1rem;display:block;filter:drop-shadow(0 0 18px var(--glow))}
+h1{
+  font-family:'Cinzel',serif;
+  font-size:clamp(1.6rem,5vw,2.4rem);
+  font-weight:700;
+  background:linear-gradient(135deg,var(--gold),var(--glow2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:0.04em;
+  margin-bottom:.5rem;
+}
+.tagline{color:var(--muted);font-size:.9rem;font-style:italic;line-height:1.5}
+
+/* ── Section label ── */
+.section-label{
+  font-size:.65rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:.75rem;
+  display:flex;align-items:center;gap:.6rem;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Appliance picker ── */
+.appliance-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:.6rem;
+  margin-bottom:2rem;
+}
+.app-btn{
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;
+  padding:.9rem .5rem;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  cursor:pointer;
+  transition:all .2s;
+  color:var(--muted);
+  font-size:.78rem;
+  font-family:inherit;
+}
+.app-btn .icon{font-size:1.8rem;line-height:1}
+.app-btn:hover{border-color:var(--glow);color:var(--text);background:#1a1a2e}
+.app-btn.selected{
+  border-color:var(--glow);
+  background:var(--card);
+  color:var(--text);
+  box-shadow:0 0 0 1px var(--glow), 0 0 20px rgba(108,99,255,.15);
+}
+.app-btn .sign{font-size:.65rem;color:var(--gold);font-style:italic}
+
+/* ── Behavior inputs ── */
+#behavior-section{display:none}
+.behavior-cards{display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem}
+.behavior-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:1rem 1.25rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.behavior-card .b-icon{font-size:1.6rem;flex-shrink:0}
+.behavior-card .b-info{flex:1;min-width:0}
+.behavior-card .b-name{font-size:.85rem;font-weight:500;color:var(--text);margin-bottom:.35rem}
+.behavior-select{
+  width:100%;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  color:var(--text);
+  font-family:inherit;
+  font-size:.8rem;
+  padding:.35rem .6rem;
+  cursor:pointer;
+  -webkit-appearance:none;
+}
+.behavior-select:focus{outline:none;border-color:var(--glow)}
+
+/* ── CTA ── */
+.cta-row{display:flex;flex-direction:column;align-items:center;gap:.75rem;margin-bottom:3rem}
+.btn-cast{
+  font-family:'Cinzel',serif;
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:.06em;
+  padding:.9rem 2.5rem;
+  background:linear-gradient(135deg,#4c44c0,var(--glow),#9b59b6);
+  border:none;border-radius:99px;
+  color:#fff;
+  cursor:pointer;
+  transition:all .25s;
+  box-shadow:0 0 30px rgba(108,99,255,.4);
+}
+.btn-cast:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(108,99,255,.6)}
+.btn-cast:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.location-hint{font-size:.75rem;color:var(--muted);font-style:italic}
+
+/* ── Loading ── */
+#loading{display:none;text-align:center;padding:4rem 2rem}
+.orb{
+  width:60px;height:60px;border-radius:50%;
+  background:conic-gradient(from 0deg,var(--glow),var(--glow2),var(--gold),var(--glow));
+  margin:0 auto 1.5rem;
+  animation:orbspin 1.2s linear infinite;
+  box-shadow:0 0 40px rgba(108,99,255,.5);
+}
+@keyframes orbspin{to{transform:rotate(360deg)}}
+.loading-msg{color:var(--muted);font-size:.95rem;font-style:italic}
+
+/* ── Results ── */
+#results{display:none}
+.cosmic-banner{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:1.25rem 1.5rem;
+  margin-bottom:1.75rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.cosmic-banner .moon-big{font-size:2.2rem;flex-shrink:0}
+.cosmic-banner .cosmic-info{}
+.cosmic-banner .cosmic-date{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem}
+.cosmic-banner .cosmic-text{font-family:'Cinzel',serif;font-size:.9rem;color:var(--gold);line-height:1.5}
+.cosmic-banner .weather-line{font-size:.75rem;color:var(--muted);margin-top:.3rem}
+
+.horoscope-list{display:flex;flex-direction:column;gap:1.25rem;margin-bottom:2rem}
+
+.h-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  transition:box-shadow .2s;
+}
+.h-card:hover{box-shadow:0 0 30px rgba(108,99,255,.12)}
+
+.h-header{
+  padding:1rem 1.25rem;
+  display:flex;align-items:center;gap:.85rem;
+  border-bottom:1px solid var(--border);
+}
+.h-icon{font-size:2rem;line-height:1}
+.h-meta{flex:1}
+.h-name{font-weight:600;font-size:1rem;margin-bottom:.15rem}
+.h-sign{font-size:.75rem;color:var(--gold);font-style:italic}
+.h-intensity{
+  font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 10px;border-radius:99px;
+}
+.intensity-Turbulent{background:#2a1220;color:var(--red)}
+.intensity-Charged{background:#1e1a0d;color:var(--gold)}
+.intensity-Stable{background:var(--green-dim);color:var(--green)}
+.intensity-Transcendent{background:#1a1230;color:var(--glow2)}
+
+.h-body{padding:1.25rem}
+.h-reading{
+  font-size:.9rem;line-height:1.75;color:#c5c3d8;
+  margin-bottom:1rem;
+}
+.h-lucky{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:.35rem .8rem;
+  font-size:.75rem;
+  color:var(--gold);
+}
+.h-lucky::before{content:'✦';opacity:.6}
+
+.share-row{
+  display:flex;gap:.6rem;justify-content:flex-end;padding:.75rem 1.25rem;
+  border-top:1px solid var(--border);
+}
+.share-btn{
+  font-size:.72rem;font-weight:500;
+  padding:.3rem .8rem;border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--surface);color:var(--muted);
+  cursor:pointer;transition:all .15s;font-family:inherit;
+}
+.share-btn:hover{border-color:var(--glow);color:var(--text)}
+
+.restart-btn{
+  display:block;margin:2rem auto 0;
+  font-family:'Cinzel',serif;font-size:.85rem;
+  padding:.65rem 1.75rem;border-radius:99px;
+  border:1px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;
+  transition:all .2s;
+}
+.restart-btn:hover{border-color:var(--glow2);color:var(--text)}
+
+/* ── Error ── */
+#err-box{
+  display:none;background:#1a0d10;border:1px solid #4a1520;
+  border-radius:var(--radius);padding:1rem 1.25rem;
+  color:#f5a89f;font-size:.875rem;margin-bottom:1.5rem;
+}
+
+/* ── Footer ── */
+footer{text-align:center;padding-top:2rem;font-size:.72rem;color:var(--muted);font-style:italic}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(120%);
+  background:var(--card);border:1px solid var(--border);
+  border-radius:99px;padding:.5rem 1.25rem;
+  font-size:.82rem;color:var(--text);
+  transition:transform .3s ease;z-index:999;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="page">
+  <header>
+    <span class="sigil">🔮</span>
+    <h1>Appliance Horoscope</h1>
+    <p class="tagline">The stars govern all things. Including your dishwasher.<br>Especially your dishwasher.</p>
+  </header>
+
+  <div id="main-form">
+    <div id="err-box"></div>
+
+    <div class="section-label">Choose your appliances</div>
+    <div class="appliance-grid" id="app-grid"></div>
+
+    <div id="behavior-section">
+      <div class="section-label">Describe their recent energy</div>
+      <div class="behavior-cards" id="behavior-cards"></div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn-cast" id="cast-btn" disabled onclick="castStars()">✦ Read the Stars ✦</button>
+      <span class="location-hint">Location used for weather influences (not stored)</span>
+    </div>
+  </div>
+
+  <div id="loading">
+    <div class="orb"></div>
+    <div class="loading-msg" id="loading-msg">Consulting the celestial bodies…</div>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<footer>Mercury may or may not be in retrograde. COSMO-TRON 3000 assumes no responsibility for appliance behaviour.</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Star field ──
+const starEl = document.getElementById('stars');
+for (let i = 0; i < 180; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2.2 + 0.4;
+  const a1 = (Math.random() * 0.25 + 0.05).toFixed(2);
+  const a2 = (Math.random() * 0.5 + 0.3).toFixed(2);
+  s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--a1:${a1};--a2:${a2};--d:${(Math.random()*4+2).toFixed(1)}s`;
+  starEl.appendChild(s);
+}
+
+// ── Appliance definitions ──
+const APPLIANCES = [
+  { id:'dishwasher', name:'Dishwasher',    icon:'🫧', sign:'Pisces',      behaviors:['Running smooth cycles','Making that noise again','Leaving spots on everything','Started mid-cycle then gave up','Smells philosophical'] },
+  { id:'fridge',     name:'Refrigerator',  icon:'🧊', sign:'Capricorn',   behaviors:['Humming steadily','Ice maker acting erratic','Running warm, denying it','Making midnight sounds','Door seal developing opinions'] },
+  { id:'washer',     name:'Washing Machine',icon:'🌀',sign:'Cancer',      behaviors:['Balanced loads, minimal drama','Vibrating across the room','Incomplete spin cycles','Eating socks (confirmed)','Refusing to drain'] },
+  { id:'dryer',      name:'Dryer',         icon:'♨️', sign:'Aries',       behaviors:['Drying efficiently','Taking 3 cycles per load','Overheating and brooding','Lint trap situation: critical','Static electricity at max'] },
+  { id:'oven',       name:'Oven',          icon:'🔥', sign:'Scorpio',     behaviors:['Accurate temp, no issues','Running 25° hotter, unbothered','Pilot light situation','Smoking without cause','Self-clean cycle as threat'] },
+  { id:'microwave',  name:'Microwave',     icon:'📡', sign:'Gemini',      behaviors:['Performing adequately','Rotating unevenly','Buttons with selective hearing','Smell of 2019 still present','Display flickering existentially'] },
+  { id:'thermostat', name:'Thermostat',    icon:'🌡️', sign:'Libra',       behaviors:['Maintaining set temp','Overshooting by 4 degrees','Disagreeing with the weather','Schedule ignored','Holding grudges about the last setback'] },
+  { id:'toaster',    name:'Toaster',       icon:'🍞', sign:'Sagittarius', behaviors:['Consistent results','Burning one side philosophically','Catapulting toast aggressively','Crumb tray situation: denied','Heating elements with opinions'] },
+  { id:'kettle',     name:'Kettle',        icon:'🫖', sign:'Aquarius',    behaviors:['Boiling reliably','Taking 40% longer lately','Scale buildup: in denial','Boiling unnecessarily','Lid issues, won\'t discuss it'] },
+  { id:'robot-vac',  name:'Robot Vacuum',  icon:'🤖', sign:'Virgo',       behaviors:['Completing maps accurately','Stuck under the couch (again)','Avoiding one corner specifically','Low battery panic mid-room','Mapped the cat, confused'] },
+  { id:'ac',         name:'Air Conditioner',icon:'❄️',sign:'Taurus',      behaviors:['Cooling efficiently','Dripping without explanation','Rattling at 2am specifically','Filter guilt: severe','Temperature wars: escalating'] },
+  { id:'coffee',     name:'Coffee Maker',  icon:'☕', sign:'Leo',         behaviors:['Brewing on schedule','Weak output, strong attitude','Carafe lid passive-aggression','Descale light: ignored for months','Grounds everywhere, no remorse'] },
+];
+
+const selected = new Set();
+let locationData = null;
+
+// ── Render appliance grid ──
+const grid = document.getElementById('app-grid');
+APPLIANCES.forEach(a => {
+  const btn = document.createElement('button');
+  btn.className = 'app-btn';
+  btn.dataset.id = a.id;
+  btn.innerHTML = `<span class="icon">${a.icon}</span><span>${a.name}</span><span class="sign">${a.sign}</span>`;
+  btn.onclick = () => toggleAppliance(a.id, btn);
+  grid.appendChild(btn);
+});
+
+function toggleAppliance(id, btn) {
+  if (selected.has(id)) { selected.delete(id); btn.classList.remove('selected'); }
+  else                   { selected.add(id);    btn.classList.add('selected'); }
+  renderBehaviors();
+  document.getElementById('cast-btn').disabled = selected.size === 0;
+}
+
+function renderBehaviors() {
+  const sec = document.getElementById('behavior-section');
+  const cards = document.getElementById('behavior-cards');
+  const chosen = APPLIANCES.filter(a => selected.has(a.id));
+  if (!chosen.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  cards.innerHTML = '';
+  chosen.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'behavior-card';
+    div.innerHTML = `
+      <span class="b-icon">${a.icon}</span>
+      <div class="b-info">
+        <div class="b-name">${a.name} <span style="color:var(--muted);font-size:.7rem;font-style:italic">${a.sign}</span></div>
+        <select class="behavior-select" id="beh-${a.id}">
+          ${a.behaviors.map(b => `<option value="${b}">${b}</option>`).join('')}
+        </select>
+      </div>`;
+    cards.appendChild(div);
+  });
+}
+
+// ── Get location ──
+async function getLocation() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) return resolve({ lat: 42.36, lon: -71.06 });
+    navigator.geolocation.getCurrentPosition(
+      p => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+      () => resolve({ lat: 42.36, lon: -71.06 }),
+      { timeout: 4000 }
+    );
+  });
+}
+
+// ── Cast the stars ──
+const LOADING_MSGS = [
+  'Consulting the celestial bodies…',
+  'Calculating appliance ascendants…',
+  'Parsing your dishwasher\'s moon sign…',
+  'Blaming Mercury retrograde (just in case)…',
+  'Communing with the cosmos…',
+];
+
+async function castStars() {
+  const btn = document.getElementById('cast-btn');
+  btn.disabled = true;
+  document.getElementById('main-form').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+
+  let msgIdx = 0;
+  const msgEl = document.getElementById('loading-msg');
+  const interval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % LOADING_MSGS.length;
+    msgEl.textContent = LOADING_MSGS[msgIdx];
+  }, 1700);
+
+  const loc = await getLocation();
+  const appliances = APPLIANCES
+    .filter(a => selected.has(a.id))
+    .map(a => ({
+      name: a.name,
+      sign: a.sign,
+      icon: a.icon,
+      behavior: document.getElementById(`beh-${a.id}`)?.value || a.behaviors[0],
+    }));
+
+  try {
+    const res = await fetch('/api/horoscope', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ appliances, lat: loc.lat, lon: loc.lon }),
+    });
+    const data = await res.json();
+    clearInterval(interval);
+    document.getElementById('loading').style.display = 'none';
+    if (data.error) { showError(data.error); return; }
+    renderResults(data);
+  } catch(e) {
+    clearInterval(interval);
+    document.getElementById('loading').style.display = 'none';
+    showError('The cosmos are unreachable. Check your server and .env.');
+  }
+}
+
+function showError(msg) {
+  document.getElementById('main-form').style.display = 'block';
+  const el = document.getElementById('err-box');
+  el.style.display = 'block';
+  el.textContent = `⚠︎ ${msg}`;
+  document.getElementById('cast-btn').disabled = false;
+}
+
+function renderResults(data) {
+  const { horoscopes, moon, weather, today } = data;
+  const h = horoscopes;
+  const resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'block';
+
+  resultsEl.innerHTML = `
+    <div class="cosmic-banner">
+      <div class="moon-big">${moon.emoji}</div>
+      <div class="cosmic-info">
+        <div class="cosmic-date">${today}</div>
+        <div class="cosmic-text">${h.cosmic_preamble}</div>
+        <div class="weather-line">Outside: ${weather.condition}, ${weather.temp}°C · ${moon.name} · Moon is ${moon.mood}</div>
+      </div>
+    </div>
+
+    <div class="horoscope-list">
+      ${h.horoscopes.map(card => `
+        <div class="h-card" id="card-${card.name.replace(/\s/g,'-')}">
+          <div class="h-header">
+            <span class="h-icon">${card.emoji}</span>
+            <div class="h-meta">
+              <div class="h-name">${card.name}</div>
+              <div class="h-sign">☽ ${card.sign}</div>
+            </div>
+            <span class="h-intensity intensity-${card.intensity}">${card.intensity}</span>
+          </div>
+          <div class="h-body">
+            <div class="h-reading">${card.reading}</div>
+            <div class="h-lucky">Lucky Setting: ${card.lucky_setting}</div>
+          </div>
+          <div class="share-row">
+            <button class="share-btn" onclick="copyCard(${JSON.stringify(card).replace(/"/g,'&quot;')})">Copy ✦</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="restart-btn" onclick="location.reload()">✦ Read Again Tomorrow ✦</button>
+  `;
+}
+
+function copyCard(card) {
+  const text = `✨ ${card.name} Horoscope (${card.sign})\n\n${card.reading}\n\n★ Lucky Setting: ${card.lucky_setting}\n\n— COSMO-TRON 3000 via ApplianceHoroscope`;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard ✦'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>
